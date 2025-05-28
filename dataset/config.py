@@ -26,16 +26,16 @@ Usage:
 """
 
 
-EQ_RAW_FOLDER = "/content/gdrive/MyDrive/De_tai_Tot_Nghiep/DATASET/K-NET/EQ/0.1g/2020"
-EQ_PROCESSED_FOLDER = "/content/gdrive/MyDrive/KLTN_Nguyen_Ngoc_Thai/DATASET/Processing_DATA/0.1g"
+EQ_RAW_FOLDER = "C:\\Users\\manhh\\EarthQuake\\data\\raw_data\\EQ\\0.1g"
+EQ_PROCESSED_FOLDER = "C:\\Users\\manhh\\EarthQuake\\data\\processed_data\\0.1g"
 
-NOISE_RAW_FOLDER = "/content/gdrive/MyDrive/De_tai_Tot_Nghiep/DATASET/K-NET/NonEQ/knuEqAccData_Walking"
-NOISE_PROCESSED_FOLDER = "/content/gdrive/MyDrive/De_tai_Tot_Nghiep/DATASET/Processing_DATA/Non_EQ/Walking"
+NOISE_RAW_FOLDER = "C:\\Users\\manhh\\EarthQuake\\data\\raw_data\\NonEQ"
+NOISE_PROCESSED_FOLDER = "C:\\Users\\manhh\\EarthQuake\\data\\processed_data\\Non_EQ"
 
-FEATURE_EQ_SLIDING = "/content/gdrive/MyDrive/De_tai_Tot_Nghiep/DATASET/Feature_EQ/feature_EQ_sliding.csv"
-FEATURE_NOISE_SINGLE = "/content/gdrive/MyDrive/De_tai_Tot_Nghiep/DATASET/Feature_NonEQ/feature_Noise_single.csv"
+FEATURE_EQ_SLIDING = "C:\\Users\\manhh\\EarthQuake\\data\\feature_data\\feature_EQ_sliding.csv"
+FEATURE_NOISE_SINGLE = "C:\\Users\\manhh\\EarthQuake\\data\\feature_data\\feature_Noise_single.csv"
 
-FINAL_DATASET_PATH = "/content/gdrive/MyDrive/De_tai_Tot_Nghiep/DATASET/final_dataset.csv"
+FINAL_DATASET_PATH = "C:\\Users\\manhh\\EarthQuake\\data\\feature_data\\dataset.csv"
 
 SAMPLING_RATE = 100
 WINDOW_DURATION = 10

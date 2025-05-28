@@ -61,28 +61,42 @@ def preprocess_eq_all(input_dir, output_dir):
         None
     """
     os.makedirs(output_dir, exist_ok=True)
-    for root, _, files in os.walk(input_dir):
-        ew_file = ns_file = ud_file = None
-        for file in files:
-            if file.endswith(".EW"):
-                ew_file = os.path.join(root, file)
-            elif file.endswith(".NS"):
-                ns_file = os.path.join(root, file)
-            elif file.endswith(".UD"):
-                ud_file = os.path.join(root, file)
-        if ew_file and ns_file and ud_file:
-            ew, ns, ud = read(ew_file)[0], read(ns_file)[0], read(ud_file)[0]
-            sr = ew.stats.sampling_rate
-            timestamps = np.arange(0, len(ew.data) / sr, 1 / sr)
-            scale = 0.00101972 * 100
-            x = ew.data * scale * ew.stats.calib
-            y = ns.data * scale * ns.stats.calib
-            z = ud.data * scale * ud.stats.calib
-            x -= np.mean(x); y -= np.mean(y); z -= np.mean(z)
-            depth, mag = extract_metadata(ew_file)
-            df = pd.DataFrame({"timestamp": timestamps, "x": x, "y": y, "z": z, "depth_km": depth, "magnitude": mag})
-            filename = os.path.splitext(os.path.basename(ew_file))[0] + ".csv"
-            df.to_csv(os.path.join(output_dir, filename), index=False)
+    
+    for root, dirs, _ in os.walk(input_dir):
+        for sub_dir in dirs:
+            second_level_path = os.path.join(root, sub_dir)
+            for third_root, _, files in os.walk(second_level_path):
+                ew_file = ns_file = ud_file = None
+                for file in files:
+                    if file.endswith(".EW"):
+                        ew_file = os.path.join(third_root, file)
+                    elif file.endswith(".NS"):
+                        ns_file = os.path.join(third_root, file)
+                    elif file.endswith(".UD"):
+                        ud_file = os.path.join(third_root, file)
+
+                if ew_file and ns_file and ud_file:
+                    try:
+                        ew, ns, ud = read(ew_file)[0], read(ns_file)[0], read(ud_file)[0]
+                        sr = ew.stats.sampling_rate
+                        timestamps = np.arange(0, len(ew.data) / sr, 1 / sr)
+                        scale = 0.00101972 * 100
+                        x = ew.data * scale * ew.stats.calib
+                        y = ns.data * scale * ns.stats.calib
+                        z = ud.data * scale * ud.stats.calib
+                        x -= np.mean(x)
+                        y -= np.mean(y)
+                        z -= np.mean(z)
+                        depth, mag = extract_metadata(ew_file)
+                        df = pd.DataFrame({
+                            "timestamp": timestamps,
+                            "x": x, "y": y, "z": z,
+                            "depth_km": depth, "magnitude": mag
+                        })
+                        filename = os.path.splitext(os.path.basename(ew_file))[0] + ".csv"
+                        df.to_csv(os.path.join(output_dir, filename), index=False)
+                    except Exception as e:
+                        print(f"Error processing {ew_file}: {e}")
 
 
 def preprocess_noise_all(source_folder, destination_folder):
@@ -99,13 +113,24 @@ def preprocess_noise_all(source_folder, destination_folder):
         None
     """
     os.makedirs(destination_folder, exist_ok=True)
-    for filename in os.listdir(source_folder):
-        if filename.endswith(".csv"):
-            try:
-                df = pd.read_csv(os.path.join(source_folder, filename))
-                if all(c in df.columns for c in ['x', 'y', 'z']):
-                    for axis in ['x', 'y', 'z']:
-                        df[axis] = (df[axis] - np.mean(df[axis])) / 9.80665
-                    df.to_csv(os.path.join(destination_folder, filename), index=False)
-            except Exception as e:
-                print(f"{filename}: {e}")
+
+    for subfolder_name in os.listdir(source_folder):
+        subfolder_path = os.path.join(source_folder, subfolder_name)
+
+        if os.path.isdir(subfolder_path):
+            output_subfolder = os.path.join(destination_folder, subfolder_name)
+            os.makedirs(output_subfolder, exist_ok=True)
+
+            for filename in os.listdir(subfolder_path):
+                if filename.endswith(".csv"):
+                    input_path = os.path.join(subfolder_path, filename)
+                    output_path = os.path.join(output_subfolder, filename)
+
+                    try:
+                        df = pd.read_csv(input_path)
+                        if all(c in df.columns for c in ['x', 'y', 'z']):
+                            for axis in ['x', 'y', 'z']:
+                                df[axis] = (df[axis] - np.mean(df[axis])) / 9.80665
+                            df.to_csv(output_path, index=False)
+                    except Exception as e:
+                        print(f"Error processing {input_path}: {e}")

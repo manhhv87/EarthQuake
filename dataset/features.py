@@ -34,7 +34,7 @@ import pandas as pd
 from scipy.stats import skew, kurtosis
 from scipy.fftpack import fft
 from config import *
-from dataset.preprocessing import preprocess_eq_all, preprocess_noise_all
+from preprocessing import preprocess_eq_all, preprocess_noise_all
 
 
 def zero_crossing_rate(signal):
@@ -63,16 +63,17 @@ def interquartile_range(signal):
     return np.percentile(signal, 75) - np.percentile(signal, 25)
 
 
-def extract_features(df):
+def extract_features(df, include_metadata=False):
     """
     Extract statistical and spectral features from x, y, z acceleration data.
+    Optionally includes metadata like depth and magnitude.
 
     Args:
-        df (pd.DataFrame): A DataFrame with columns 'x', 'y', 'z' representing acceleration data.
+        df (pd.DataFrame): DataFrame with 'x', 'y', 'z' columns and optionally 'depth_km', 'magnitude'.
+        include_metadata (bool): Whether to include depth and magnitude in the features.
 
     Returns:
-        dict: A dictionary of features including mean, std, min, max, skewness, kurtosis,
-              peak-to-peak, IQR, dominant frequency, energy, and zero-crossing rate for each axis.
+        dict: Extracted features.
     """
     features = {}
     for axis in ['x', 'y', 'z']:
@@ -89,6 +90,11 @@ def extract_features(df):
         features[f'Dominant_freq_{axis}'] = np.argmax(fft_values)
         features[f'Energy_{axis}'] = np.sum(fft_values**2)
         features[f'ZC_{axis}'] = zero_crossing_rate(data)
+
+    if include_metadata:
+        features['Depth_km'] = df['depth_km'].iloc[0] if 'depth_km' in df.columns else None
+        features['Magnitude'] = df['magnitude'].iloc[0] if 'magnitude' in df.columns else None
+        
     return features
 
 
@@ -115,7 +121,7 @@ def extract_sliding_features_all(data_folder, output_path, sr, duration, overlap
                 df = pd.read_csv(os.path.join(root, file))
                 for start in range(0, len(df) - samples + 1, step):
                     segment = df.iloc[start:start + samples]
-                    features_list.append(extract_features(segment))
+                    features_list.append(extract_features(segment, include_metadata=True))
     pd.DataFrame(features_list).to_csv(output_path, index=False)
 
 
@@ -135,7 +141,7 @@ def extract_features_all_single_row(data_folder, output_path):
         for file in files:
             if file.endswith(".csv"):
                 df = pd.read_csv(os.path.join(root, file))
-                all_features.append(extract_features(df))
+                all_features.append(extract_features(df, include_metadata=False))
     pd.DataFrame(all_features).to_csv(output_path, index=False)
 
 
@@ -153,9 +159,16 @@ def build_final_dataset(eq_feature_path, noise_feature_path, output_path):
     """
     eq_df = pd.read_csv(eq_feature_path)
     eq_df["label"] = 1
+
     noise_df = pd.read_csv(noise_feature_path)
     noise_df["label"] = 0
-    df = pd.concat([eq_df, noise_df], ignore_index=True)
+
+    # Add missing columns to noise_df to match eq_df
+    for col in ['Depth_km', 'Magnitude']:
+        if col not in noise_df.columns:
+            noise_df[col] = np.nan
+
+    df = pd.concat([eq_df, noise_df], ignore_index=True, sort=False)
     df.to_csv(output_path, index=False)
     print(f"Final dataset saved: {output_path}")
 
