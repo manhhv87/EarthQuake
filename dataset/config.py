@@ -26,16 +26,16 @@ Usage:
 """
 
 
-EQ_RAW_FOLDER = "C:\\Users\\manhh\\EarthQuake\\data\\raw_data\\EQ\\0.1g"
-EQ_PROCESSED_FOLDER = "C:\\Users\\manhh\\EarthQuake\\data\\processed_data\\0.1g"
+EQ_RAW_FOLDER = "/content/EarthQuake/data/raw_data/EQ/0.1g"
+EQ_PROCESSED_FOLDER = "/content/EarthQuake/data/processed_data/0.1g"
 
-NOISE_RAW_FOLDER = "C:\\Users\\manhh\\EarthQuake\\data\\raw_data\\NonEQ"
-NOISE_PROCESSED_FOLDER = "C:\\Users\\manhh\\EarthQuake\\data\\processed_data\\Non_EQ"
+NOISE_RAW_FOLDER = "/content/EarthQuake/data/raw_data/NonEQ"
+NOISE_PROCESSED_FOLDER = "/content/EarthQuake/data/processed_data/Non_EQ"
 
-FEATURE_EQ_SLIDING = "C:\\Users\\manhh\\EarthQuake\\data\\feature_data\\feature_EQ_sliding.csv"
-FEATURE_NOISE_SINGLE = "C:\\Users\\manhh\\EarthQuake\\data\\feature_data\\feature_Noise_single.csv"
+FEATURE_EQ_SLIDING = "/content/EarthQuake/data/feature_data/feature_EQ_sliding.csv"
+FEATURE_NOISE_SINGLE = "/content/EarthQuake/data/feature_data/feature_Noise_single.csv"
 
-FINAL_DATASET_PATH = "C:\\Users\\manhh\\EarthQuake\\data\\feature_data\\dataset.csv"
+FINAL_DATASET_PATH = "/content/EarthQuake/data/feature_data/dataset.csv"
 
 SAMPLING_RATE = 100
 WINDOW_DURATION = 10
