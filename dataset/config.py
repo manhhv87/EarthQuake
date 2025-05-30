@@ -33,7 +33,7 @@ NOISE_RAW_FOLDER = "/content/EarthQuake/data/raw_data/NonEQ"
 NOISE_PROCESSED_FOLDER = "/content/EarthQuake/data/processed_data/Non_EQ"
 
 FEATURE_EQ_SLIDING = "/content/EarthQuake/data/feature_data/feature_EQ_sliding.csv"
-FEATURE_NOISE_SINGLE = "/content/EarthQuake/data/feature_data/feature_Noise_single.csv"
+FEATURE_NOISE_SLIDING = "/content/EarthQuake/data/feature_data/feature_Noise_sliding.csv"
 
 FINAL_DATASET_PATH = "/content/EarthQuake/data/feature_data/dataset.csv"
 

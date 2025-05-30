@@ -98,7 +98,7 @@ def extract_features(df, include_metadata=False):
     return features
 
 
-def extract_sliding_features_all(data_folder, output_path, sr, duration, overlap):
+def extract_sliding_features(data_folder, output_path, sr, duration, overlap, metadata=False):
     """
     Extract features using a sliding window approach from all CSV files in a directory.
 
@@ -121,28 +121,8 @@ def extract_sliding_features_all(data_folder, output_path, sr, duration, overlap
                 df = pd.read_csv(os.path.join(root, file))
                 for start in range(0, len(df) - samples + 1, step):
                     segment = df.iloc[start:start + samples]
-                    features_list.append(extract_features(segment, include_metadata=True))
+                    features_list.append(extract_features(segment, include_metadata=metadata))
     pd.DataFrame(features_list).to_csv(output_path, index=False)
-
-
-def extract_features_all_single_row(data_folder, output_path):
-    """
-    Extract features from the entire signal of each CSV file (one feature row per file).
-
-    Args:
-        data_folder (str): Path to the folder containing input CSV files.
-        output_path (str): Path to save the output CSV file with features.
-
-    Returns:
-        None
-    """
-    all_features = []
-    for root, _, files in os.walk(data_folder):
-        for file in files:
-            if file.endswith(".csv"):
-                df = pd.read_csv(os.path.join(root, file))
-                all_features.append(extract_features(df, include_metadata=False))
-    pd.DataFrame(all_features).to_csv(output_path, index=False)
 
 
 def build_final_dataset(eq_feature_path, noise_feature_path, output_path):
@@ -188,9 +168,9 @@ def execute_feature_pipeline():
     print("Starting the full processing pipeline...")
     preprocess_eq_all(EQ_RAW_FOLDER, EQ_PROCESSED_FOLDER)
     preprocess_noise_all(NOISE_RAW_FOLDER, NOISE_PROCESSED_FOLDER)
-    extract_sliding_features_all(EQ_PROCESSED_FOLDER, FEATURE_EQ_SLIDING, SAMPLING_RATE, WINDOW_DURATION, OVERLAP)
-    extract_features_all_single_row(NOISE_PROCESSED_FOLDER, FEATURE_NOISE_SINGLE)
-    build_final_dataset(FEATURE_EQ_SLIDING, FEATURE_NOISE_SINGLE, FINAL_DATASET_PATH)
+    extract_sliding_features(EQ_PROCESSED_FOLDER, FEATURE_EQ_SLIDING, SAMPLING_RATE, WINDOW_DURATION, OVERLAP, True)
+    extract_sliding_features(NOISE_PROCESSED_FOLDER, FEATURE_NOISE_SLIDING, SAMPLING_RATE, WINDOW_DURATION, OVERLAP, False)
+    build_final_dataset(FEATURE_EQ_SLIDING, FEATURE_NOISE_SLIDING, FINAL_DATASET_PATH)
 
 
 if __name__ == "__main__":
